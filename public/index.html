@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Agusan National Science High School</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav>
+        <h2>ANSHS Portal</h2>
+
+        <div>
+            <a href="/">Home</a>
+            <a href="/about.html">About</a>
+            <a href="/news.html">News</a>
+            <a href="/contact.html">Contact</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+
+        <h1>
+            Agusan National Science High School
+        </h1>
+
+        <p>
+            Official School Portal
+        </p>
+
+    </section>
+
+    <section class="latest-news">
+
+        <h2>Latest News</h2>
+
+        <div id="latestNews"></div>
+
+    </section>
+
+    <script>
+
+        fetch("/api/news")
+            .then(res => res.json())
+            .then(data => {
+
+                let html = "";
+
+                data.forEach(item => {
+
+                    html += `
+                        <div class="card">
+                            <h3>${item.title}</h3>
+                            <p>${item.content}</p>
+                        </div>
+                    `;
+
+                });
+
+                document.getElementById("latestNews").innerHTML = html;
+
+            });
+
+    </script>
+
+</body>
+</html>

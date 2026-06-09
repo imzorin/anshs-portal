@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>School News</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <h1>School News</h1>
+
+    <div id="news"></div>
+
+    <script>
+
+        fetch("/api/news")
+            .then(res => res.json())
+            .then(data => {
+
+                let html = "";
+
+                data.forEach(item => {
+
+                    html += `
+                        <div class="card">
+                            <h2>${item.title}</h2>
+                            <p>${item.content}</p>
+                            <small>${item.date_posted}</small>
+                        </div>
+                    `;
+
+                });
+
+                document.getElementById("news").innerHTML = html;
+
+            });
+
+    </script>
+
+</body>
+
+</html>

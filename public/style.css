@@ -1,0 +1,48 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+nav{
+    background:#003366;
+    color:white;
+    padding:15px 40px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+nav a{
+    color:white;
+    text-decoration:none;
+    margin-left:20px;
+}
+
+.hero{
+    text-align:center;
+    padding:100px 20px;
+    background:#f4f4f4;
+}
+
+.hero h1{
+    font-size:48px;
+    margin-bottom:15px;
+}
+
+.hero p{
+    font-size:20px;
+}
+
+.latest-news{
+    padding:50px;
+}
+
+.card{
+    border:1px solid #ddd;
+    border-radius:10px;
+    padding:20px;
+    margin-top:20px;
+}
