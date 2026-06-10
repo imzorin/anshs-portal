@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Registration</title>
+</head>
+<body>
+
+<h1>Student Registration</h1>
+
+<input type="text" id="fullname" placeholder="Full Name">
+<br><br>
+
+<input type="text" id="grade" placeholder="Grade Level">
+<br><br>
+
+<input type="text" id="section" placeholder="Section">
+<br><br>
+
+<input type="email" id="email" placeholder="Email">
+<br><br>
+
+<button onclick="registerStudent()">
+Register
+</button>
+
+<script>
+
+async function registerStudent() {
+
+    const fullname =
+    document.getElementById("fullname").value;
+
+    const grade =
+    document.getElementById("grade").value;
+
+    const section =
+    document.getElementById("section").value;
+
+    const email =
+    document.getElementById("email").value;
+
+    const response = await fetch("/api/students", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+            fullname,
+            grade,
+            section,
+            email
+        })
+
+    });
+
+    const result = await response.json();
+
+    alert(result.message);
+
+}
+
+</script>
+
+</body>
+</html>

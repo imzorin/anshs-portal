@@ -20,13 +20,41 @@
 
     <section class="hero">
 
-        <h1>
-            Agusan National Science High School
-        </h1>
+        <div class="hero-left">
 
-        <p>
-            Official School Portal
-        </p>
+            <h1>
+                Agusan National Science High School
+            </h1>
+
+            <p>
+                Official School Portal
+            </p>
+
+        </div>
+
+        <div class="login-card">
+
+            <h3>Admin Login</h3>
+
+            <input
+                type="text"
+                id="username"
+                placeholder="Username">
+
+            <br><br>
+
+            <input
+                type="password"
+                id="password"
+                placeholder="Password">
+
+            <br><br>
+
+            <button onclick="login()">
+                Login
+            </button>
+
+        </div>
 
     </section>
 
@@ -60,6 +88,48 @@
                 document.getElementById("latestNews").innerHTML = html;
 
             });
+
+        async function login() {
+
+            const username =
+                document.getElementById("username").value;
+
+            const password =
+                document.getElementById("password").value;
+
+            const response =
+                await fetch("/api/login", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        username,
+                        password
+                    })
+
+                });
+
+            const result =
+                await response.json();
+
+            if (result.success) {
+
+                window.location =
+                    "/admin.html";
+
+            } else {
+
+                alert(
+                    "Invalid Username or Password"
+                );
+
+            }
+
+        }
 
     </script>
 

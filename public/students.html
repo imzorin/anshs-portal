@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Students Dashboard</title>
+</head>
+<body>
+
+<h1>Registered Students</h1>
+
+<table border="1">
+
+    <thead>
+
+        <tr>
+
+            <th>ID</th>
+            <th>Full Name</th>
+            <th>Grade</th>
+            <th>Section</th>
+            <th>Email</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody id="studentTable">
+
+    </tbody>
+
+</table>
+
+<script>
+
+fetch("/api/students")
+.then(res => res.json())
+.then(data => {
+
+    let html = "";
+
+    data.forEach(student => {
+
+        html += `
+        <tr>
+
+            <td>${student.id}</td>
+            <td>${student.fullname}</td>
+            <td>${student.grade_level}</td>
+            <td>${student.section}</td>
+            <td>${student.email}</td>
+
+        </tr>
+        `;
+
+    });
+
+    document.getElementById(
+        "studentTable"
+    ).innerHTML = html;
+
+});
+
+</script>
+
+</body>
+</html>
