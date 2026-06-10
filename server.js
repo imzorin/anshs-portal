@@ -1,5 +1,7 @@
+require("dotenv").config();
+
 const express = require("express");
-const mysql = require("mysql2");
+const { Pool } = require("pg");
 const cors = require("cors");
 
 const app = express();
@@ -8,46 +10,35 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
 
-// MYSQL CONNECTION
-const db = mysql.createConnection({
-    host: process.env.MYSQLHOST,
-    user: process.env.MYSQLUSER,
-    password: process.env.MYSQLPASSWORD,
-    database: process.env.MYSQLDATABASE,
-    port: process.env.MYSQLPORT
-});
-
-db.connect((err) => {
-    if (err) {
-        console.log(err);
-        return;
+const db = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false
     }
-
-    console.log("MySQL Connected!");
 });
+
+db.connect()
+    .then(() => console.log("Neon Connected!"))
+    .catch(err => console.log(err));
 
 // GET ALL STUDENTS
-app.get("/api/students", (req, res) => {
+app.get("/api/students", async (req, res) => {
+    try {
+        const result = await db.query(
+            "SELECT * FROM students ORDER BY id DESC"
+        );
 
-    db.query(
-        "SELECT * FROM students ORDER BY id DESC",
-        (err, result) => {
+        res.json(result.rows);
 
-            if (err) {
+    } catch (err) {
 
-                console.log(err);
+        console.log(err);
 
-                return res.status(500).json({
-                    message: "Database Error"
-                });
+        res.status(500).json({
+            message: "Database Error"
+        });
 
-            }
-
-            res.json(result);
-
-        }
-    );
-
+    }
 });
 
 // HOME PAGE
@@ -56,129 +47,131 @@ app.get("/", (req, res) => {
 });
 
 // GET ALL NEWS
-app.get("/api/news", (req, res) => {
+app.get("/api/news", async (req, res) => {
 
-    db.query(
-        "SELECT * FROM news ORDER BY id DESC",
-        (err, result) => {
+    try {
 
-            if (err) {
-                console.log(err);
+        const result = await db.query(
+            "SELECT * FROM news ORDER BY id DESC"
+        );
 
-                return res.status(500).json({
-                    message: "Database Error"
-                });
-            }
+        res.json(result.rows);
 
-            res.json(result);
+    } catch (err) {
 
-        }
-    );
+        console.log(err);
+
+        res.status(500).json({
+            message: "Database Error"
+        });
+
+    }
 
 });
 
 // ADD NEWS
-app.post("/api/news", (req, res) => {
+app.post("/api/news", async (req, res) => {
 
-    const { title, content } = req.body;
+    try {
 
-    db.query(
-        "INSERT INTO news(title, content, date_posted) VALUES (?, ?, CURDATE())",
-        [title, content],
-        (err, result) => {
+        const { title, content } = req.body;
 
-            if (err) {
-                console.log(err);
+        await db.query(
+            "INSERT INTO news(title, content, date_posted) VALUES ($1, $2, CURRENT_DATE)",
+            [title, content]
+        );
 
-                return res.status(500).json({
-                    message: "Database Error"
-                });
-            }
+        res.json({
+            message: "News added successfully!"
+        });
 
-            res.json({
-                message: "News added successfully!"
-            });
+    } catch (err) {
 
-        }
-    );
+        console.log(err);
+
+        res.status(500).json({
+            message: "Database Error"
+        });
+
+    }
 
 });
 
 // REGISTER STUDENT
-app.post("/api/students", (req, res) => {
+app.post("/api/students", async (req, res) => {
 
-    const {
-        fullname,
-        grade,
-        section,
-        email
-    } = req.body;
+    try {
 
-    db.query(
-        `INSERT INTO students
-        (fullname, grade_level, section, email, date_registered)
-        VALUES (?, ?, ?, ?, CURDATE())`,
-        [
+        const {
             fullname,
             grade,
             section,
             email
-        ],
-        (err, result) => {
+        } = req.body;
 
-            if (err) {
-                console.log(err);
+        await db.query(
+            `INSERT INTO students
+            (fullname, grade_level, section, email, date_registered)
+            VALUES ($1, $2, $3, $4, CURRENT_DATE)`,
+            [
+                fullname,
+                grade,
+                section,
+                email
+            ]
+        );
 
-                return res.status(500).json({
-                    message: "Database Error"
-                });
-            }
+        res.json({
+            message: "Student Registered Successfully!"
+        });
 
-            res.json({
-                message: "Student Registered Successfully!"
-            });
+    } catch (err) {
 
-        }
-    );
+        console.log(err);
+
+        res.status(500).json({
+            message: "Database Error"
+        });
+
+    }
 
 });
 
 // LOGIN
-app.post("/api/login", (req, res) => {
+app.post("/api/login", async (req, res) => {
 
-    const { username, password } = req.body;
+    try {
 
-    db.query(
-        "SELECT * FROM admins WHERE username = ? AND password = ?",
-        [username, password],
-        (err, result) => {
+        const { username, password } = req.body;
 
-            if (err) {
+        const result = await db.query(
+            "SELECT * FROM admins WHERE username = $1 AND password = $2",
+            [username, password]
+        );
 
-                console.log(err);
+        if (result.rows.length > 0) {
 
-                return res.status(500).json({
-                    success: false
-                });
+            res.json({
+                success: true
+            });
 
-            }
+        } else {
 
-            if (result.length > 0) {
-
-                res.json({
-                    success: true
-                });
-
-            } else {
-
-                res.json({
-                    success: false
-                });
-
-            }
+            res.json({
+                success: false
+            });
 
         }
-    );
+
+    } catch (err) {
+
+        console.log(err);
+
+        res.status(500).json({
+            success: false
+        });
+
+    }
 
 });
 
